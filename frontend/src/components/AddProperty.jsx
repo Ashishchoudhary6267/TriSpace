@@ -1,24 +1,39 @@
 import { useState } from 'react';
 
 function AddProperty({ onPropertyAdded }) {
+
+  const user = JSON.parse(localStorage.getItem('user'));
+
   const [formData, setFormData] = useState({
     title: '',
     type: 'Flat',
     sectorOrPhase: '',
     city: 'Mohali',
     monthlyRent: '',
-    owner: '69bfc24393a00f873ac36fac' // Hardcoded your ID for now!
+    owner: user?.id // Use the logged-in user's ID
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Safety Check: If no user is found, stop here! 
+    if (!user || !user.id) {
+      alert("Please login again to post a property.");
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:5000/api/properties/add', {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/properties/add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         // We structure the body to match your Mongoose Schema
         body: JSON.stringify({
           ...formData,
+          owner: user.id,  // Use the logged-in user's ID
           address: {
             sectorOrPhase: formData.sectorOrPhase,
             city: formData.city
@@ -28,7 +43,7 @@ function AddProperty({ onPropertyAdded }) {
 
       if (response.ok) {
         alert("Property listed successfully! 🚀");
-        setFormData({ title: '', type: 'Flat', sectorOrPhase: '', city: 'Mohali', monthlyRent: '', owner: '69bfc24393a00f873ac36fac' });
+        setFormData({ title: '', type: 'Flat', sectorOrPhase: '', city: 'Mohali', monthlyRent: '', owner: user?.id });
         onPropertyAdded(); // This refreshes the list automatically
       }
     } catch (err) {

@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User'); 
 
 // POST ROUTE: Register a new user
@@ -14,18 +16,37 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists!' });
     }
 
-    // 3. Create a new user using your blueprint
+    // 3. Hash the password (10 rounds of salting)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 4. Create a new user using your blueprint
     const newUser = new User({  
       name,
       email,
-      password, 
+      password: hashedPassword, 
       role
     });
 
-    // 4. Save them to the database
+    // 5. Save them to the database
     await newUser.save();
     
-    res.status(201).json({ message: 'User registered successfully!', user: newUser });
+    // 6. Sign JWT token
+    const token = jwt.sign(
+      { id: newUser._id, email: newUser.email, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    res.status(201).json({ 
+      message: 'User registered successfully!', 
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role
+      }
+    });
 
   } catch (error) {
     console.log(error);
@@ -45,15 +66,22 @@ router.post('/login', async (req, res) => {
       return res.status(404).json({ message: 'User not found!' });
     }
 
-    // 3. Check if the password matches 
-    // (We are comparing exact text for now. Later we will use encrypted passwords!)
-    if (user.password !== password) {
+    // 3. Compare the plain text password with the hashed password in database
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
       return res.status(401).json({ message: 'Invalid password!' });
     }
 
-    // 4. If everything matches, let them in!
+    // 4. If everything matches, sign a JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
     res.status(200).json({ 
       message: `Welcome back, ${user.name}!`, 
+      token,
       user: {
         id: user._id,
         name: user.name,

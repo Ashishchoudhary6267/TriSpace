@@ -9,7 +9,7 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -33,9 +33,7 @@ function Register() {
         <input type="email" placeholder="Email Address" onChange={(e)=>setFormData({...formData, email: e.target.value})} className="w-full p-3 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-blue-500" required />
         <input type="password" placeholder="Password" onChange={(e)=>setFormData({...formData, password: e.target.value})} className="w-full p-3 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-blue-500" required />
         <select onChange={(e)=>setFormData({...formData, role: e.target.value})} className="w-full p-3 rounded-xl border border-gray-300 outline-none bg-white">
-          <option value="Tenant">I need a Room/PG</option>
-          <option value="Owner">I want to list a Property</option>
-          <option value="TiffinProvider">I provide Tiffin Service</option>
+          <option value="Tenant">I'm a Tenant</option>
         </select>
         <button type="submit" className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-200 transition transform active:scale-95">Create Account</button>
       </form>

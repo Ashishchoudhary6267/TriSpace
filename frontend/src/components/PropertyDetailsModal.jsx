@@ -33,6 +33,23 @@ function PropertyDetailsModal({ property, onClose }) {
         {/* Scrollable Body */}
         <div className="p-6 overflow-y-auto space-y-6 text-slate-600 flex-1">
           
+          {/* Image Gallery */}
+          {(property.images?.length > 0 || property.image) && (
+            <div className="flex gap-2 overflow-x-auto pb-2 snap-x">
+              {(property.images?.length > 0 ? property.images : [property.image]).map((img, idx) => {
+                const imgUrl = img?.startsWith('/uploads') ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${img}` : img;
+                return (
+                  <img 
+                    key={idx} 
+                    src={imgUrl} 
+                    alt={`${property.title} - ${idx + 1}`} 
+                    className="w-64 h-48 object-cover rounded-xl flex-shrink-0 snap-center shadow-sm border border-gray-200"
+                  />
+                );
+              })}
+            </div>
+          )}
+
           {/* Price & Address Card */}
           <div className="flex justify-between items-center bg-slate-50 p-5 rounded-2xl border border-slate-100">
             <div>

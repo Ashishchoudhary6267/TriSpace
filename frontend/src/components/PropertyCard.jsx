@@ -3,20 +3,28 @@ import { useState } from 'react';
 function PropertyCard({ property, onFavoriteClick, isFavorite, onDetailsClick }) {
   const [imageError, setImageError] = useState(false);
 
+  const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('/uploads')) {
+      return `${import.meta.env.VITE_API_URL.replace('/api', '')}${url}`;
+    }
+    return url;
+  };
+
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition transform hover:scale-105">
       {/* Image */}
       <div className="relative h-64 bg-gray-200 overflow-hidden group">
         {!imageError && property.image ? (
           <img
-            src={property.image}
+            src={getImageUrl(property.image)}
             alt={property.title}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-300 to-gray-400">
-            <span className="text-4xl">🏠</span>
+            <img src="/my-property.png" alt="default property" className="w-full h-full object-cover" />
           </div>
         )}
 
@@ -76,7 +84,7 @@ function PropertyCard({ property, onFavoriteClick, isFavorite, onDetailsClick })
           <div>
             <p className="text-gray-500 text-sm">Rent per month</p>
             <p className="text-3xl font-bold text-green-600">
-              ₹{property.price?.toLocaleString() || 'N/A'}
+              ₹{property.monthlyRent?.toLocaleString() || 'N/A'}
             </p>
           </div>
           <button

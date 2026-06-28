@@ -1,35 +1,35 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Add this line!
+import { useNavigate } from 'react-router-dom';
+import { loginUser, setCurrentUser } from '../api/auth';
+import { useAuth } from '../hooks/useAuth';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await response.json();
-
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token); // Save JWT token
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setMessage("✅ " + data.message);
-        setTimeout(() => {
-         navigate('/home'); 
-       }, 1500);
-      } else {
-        setMessage("❌ " + data.message);
-      }
+      const data = await loginUser(email, password);
+      
+      // Save to localStorage and context
+      setCurrentUser(data.user, data.token);
+      login(data.user, data.token);
+      
+      setMessage('✅ ' + data.message);
+      setTimeout(() => {
+        navigate('/home');
+      }, 1500);
     } catch (error) {
-      setMessage("❌ Connection error. Is the backend running?");
+      setMessage('❌ ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,6 +48,7 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
             required
+            disabled={loading}
           />
         </div>
         <div>
@@ -59,13 +60,15 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
             required
+            disabled={loading}
           />
         </div>
         <button 
           type="submit" 
-          className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transition transform active:scale-95"
+          disabled={loading}
+          className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transition transform active:scale-95"
         >
-          Sign In
+          {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
 

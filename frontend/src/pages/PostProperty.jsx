@@ -6,6 +6,7 @@ function PostProperty() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
   const [loading, setLoading] = useState(false);
+  const [imageFiles, setImageFiles] = useState([]);
 
   // Redirect if not logged in
   if (!user) {
@@ -45,6 +46,37 @@ function PostProperty() {
 
     try {
       const token = localStorage.getItem('token');
+      
+      if (imageFiles.length === 0) {
+        alert("Please select at least 1 image (up to 5).");
+        setLoading(false);
+        return;
+      }
+
+      let imageUrls = [];
+
+      // Upload images first
+      const uploadFormData = new FormData();
+      imageFiles.forEach(file => uploadFormData.append('images', file));
+
+      const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/properties/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: uploadFormData
+      });
+
+      if (uploadRes.ok) {
+        const uploadData = await uploadRes.json();
+        imageUrls = uploadData.imageUrls;
+      } else {
+        const errorData = await uploadRes.json();
+        alert("❌ Image upload failed: " + (errorData.error || "Unknown error"));
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_URL}/properties/add`, {
         method: 'POST',
         headers: { 
@@ -63,7 +95,9 @@ function PostProperty() {
           bhk: formData.bhk,
           size: formData.size ? parseInt(formData.size) : null,
           description: formData.description,
-          amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()) : []
+          amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()) : [],
+          images: imageUrls,
+          image: imageUrls.length > 0 ? imageUrls[0] : null
         })
       });
 
@@ -80,6 +114,7 @@ function PostProperty() {
           description: '',
           amenities: ''
         });
+        setImageFiles([]);
         // Redirect back to home after 2 seconds
         setTimeout(() => navigate('/home'), 2000);
       } else {
@@ -233,6 +268,49 @@ function PostProperty() {
                 value={formData.description}
                 onChange={handleChange}
               ></textarea>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Property Images (Max 5)</label>
+              <input 
+                type="file" 
+                multiple
+                accept="image/*"
+                onChange={(e) => {
+                  const newFiles = Array.from(e.target.files);
+                  setImageFiles(prev => {
+                    const combined = [...prev, ...newFiles];
+                    if (combined.length > 5) {
+                      alert('You can only upload a maximum of 5 images. Extra images were ignored.');
+                      return combined.slice(0, 5);
+                    }
+                    return combined;
+                  });
+                  e.target.value = ''; // Reset input to allow selecting the same file again if removed
+                }}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              {imageFiles.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-sm text-gray-500 font-medium">Selected {imageFiles.length} file(s) (Max 5):</p>
+                  <div className="flex flex-col gap-2">
+                    {imageFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-200">
+                        <span className="text-sm text-gray-700 truncate mr-2">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImageFiles(prev => prev.filter((_, i) => i !== index));
+                          }}
+                          className="text-red-500 hover:text-red-700 font-bold text-lg leading-none px-2"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>

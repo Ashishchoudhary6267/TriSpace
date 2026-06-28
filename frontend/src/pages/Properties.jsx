@@ -1,21 +1,23 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import PropertyCard from '../components/PropertyCard';
 import PropertyDetailsModal from '../components/PropertyDetailsModal';
 
 function Properties() {
+  const [searchParams] = useSearchParams();
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [userFavorites, setUserFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filter states
+  // Filter states - initialize with URL params if available
   const [filters, setFilters] = useState({
-    searchTerm: '',
-    type: 'All',
-    city: 'All',
-    maxRent: 'All'
+    searchTerm: searchParams.get('searchTerm') || '',
+    type: searchParams.get('type') || 'All',
+    city: searchParams.get('city') || 'All',
+    maxRent: searchParams.get('maxRent') || 'All'
   });
 
   const user = JSON.parse(localStorage.getItem('user'));
@@ -141,19 +143,19 @@ function Properties() {
       <Navbar />
 
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Find Your Perfect Property</h1>
-          <p className="text-gray-600 text-lg">Browse through our collection of verified properties</p>
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-8 sm:py-12 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-12">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Find Your Perfect Property</h1>
+          <p className="text-gray-600 text-base sm:text-lg">Browse through our collection of verified properties</p>
         </div>
       </div>
 
       {/* Filters Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 mb-8">
+      <div className="w-full px-4 sm:px-6 lg:px-12 py-8">
+        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Filter Properties</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Search */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Search</label>
@@ -163,7 +165,7 @@ function Properties() {
                 placeholder="Title, location..."
                 value={filters.searchTerm}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base"
               />
             </div>
 
@@ -174,7 +176,7 @@ function Properties() {
                 name="type"
                 value={filters.type}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white text-sm sm:text-base"
               >
                 <option value="All">All Types</option>
                 <option value="Flat">Flat</option>
@@ -191,7 +193,7 @@ function Properties() {
                 name="city"
                 value={filters.city}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white text-sm sm:text-base"
               >
                 <option value="All">All Cities</option>
                 <option value="Mohali">Mohali</option>
@@ -207,7 +209,7 @@ function Properties() {
                 name="maxRent"
                 value={filters.maxRent}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white text-sm sm:text-base"
               >
                 <option value="All">Any Budget</option>
                 <option value="10000">Up to ₹10,000</option>
@@ -221,7 +223,7 @@ function Properties() {
             <div className="flex items-end">
               <button
                 onClick={handleClearFilters}
-                className="w-full px-4 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition"
+                className="w-full px-4 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
               >
                 Clear Filters
               </button>
@@ -231,7 +233,7 @@ function Properties() {
 
         {/* Results Summary */}
         <div className="mb-6">
-          <p className="text-gray-600 font-semibold">
+          <p className="text-gray-600 font-semibold text-sm sm:text-base">
             Showing <span className="text-blue-600">{filteredProperties.length}</span> properties
           </p>
         </div>
@@ -261,7 +263,7 @@ function Properties() {
 
         {/* Properties Grid */}
         {!loading && filteredProperties.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-12">
             {filteredProperties.map((property) => (
               <PropertyCard
                 key={property._id}

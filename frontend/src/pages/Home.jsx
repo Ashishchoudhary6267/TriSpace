@@ -88,15 +88,15 @@ function Home() {
       <FeaturesSection />
 
       {/* Popular Listings Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 bg-gray-50 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-12">
           {/* Section Header */}
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6 mb-12">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-2">Popular Listings</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Popular Listings</h2>
               <p className="text-gray-600">Check out our most viewed properties</p>
             </div>
-            <a href="#" className="text-blue-600 font-semibold hover:text-blue-700 text-lg">
+            <a href="#" className="text-blue-600 font-semibold hover:text-blue-700 text-lg whitespace-nowrap">
               View All →
             </a>
           </div>
@@ -121,7 +121,7 @@ function Home() {
 
           {/* Properties Grid */}
           {!loading && properties.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               {properties.slice(0, 8).map((property) => (
                 <PropertyCard
                   key={property._id}
@@ -137,7 +137,7 @@ function Home() {
           {/* View All Button */}
           {properties.length > 8 && (
             <div className="text-center mt-12">
-              <button className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg">
+              <button onClick={() => navigate('/properties')} className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg">
                 Load More Properties
               </button>
             </div>
@@ -146,15 +146,15 @@ function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-blue-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Have a property to list?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+      <section className="py-16 sm:py-20 bg-blue-600 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-12 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 sm:mb-6">Have a property to list?</h2>
+          <p className="text-lg sm:text-xl text-blue-100 mb-8">
             Join thousands of property owners who trust TriSpace to find perfect tenants
           </p>
           <button
             onClick={() => user ? navigate('/post-property') : navigate('/')}
-            className="px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition shadow-lg text-lg"
+            className="px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition shadow-lg text-base sm:text-lg"
           >
             Post Your Property
           </button>
@@ -162,9 +162,9 @@ function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <footer className="bg-gray-900 text-gray-400 py-12 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="text-2xl font-bold text-white mb-4">
                 <span className="text-blue-500">Tri</span>Space

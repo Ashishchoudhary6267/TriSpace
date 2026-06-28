@@ -27,6 +27,14 @@ const PropertySchema = new mongoose.Schema({
     type: String, 
     enum: ['Pending', 'Approved', 'Rejected'], 
     default: 'Pending' 
+  },
+  images: { 
+    type: [String],
+    validate: [v => v.length >= 1, 'At least one image is required']
+  },
+  image: { 
+    type: String, 
+    default: null 
   }
 }, { timestamps: true });
 
